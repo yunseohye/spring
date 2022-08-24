@@ -15,4 +15,66 @@
     <property name="suffix" value=".jsp" /> 
 </bean>
 
+<bean id="beanNameUrlMapping"
+class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"></bean>
+<bean name="/test/msg.action" class="com.test.TestController"></bean>
+
+<!-- SimpleUrlHandlerMapping방식 -->
+<!-- alwaysUseFullPath
+주소를 쓸 때 값이 
+true : http://localhost/test/a.action (중간주소를 사용할 수 있다.)
+false: http://localhost/a.action (중간주소를 사용하지 못한다.)
+-->
+
+<bean id="handlerMapping"
+class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+	<property name="order" value="1" />
+	<property name="alwaysUseFullPath" value="true"/>
+	<property name="mappings">
+		<props>
+			<prop key="/test/write.action">listFormController</prop>
+			<prop key="/test/write_ok.action">listController</prop>
+			<prop key="/test1/login.action">loginController</prop>
+			<prop key="/test2/mem.action">memController</prop>
+			<prop key="/multi/*.action">multiTestController</prop>
+		</props>
+	</property>
+</bean>
+
+<bean id="propsResolver" 
+class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+	<property name="mappings">
+		<props>
+			<prop key="/multi/list.action">list</prop>
+			<prop key="/multi/view.action">view</prop>
+		</props>
+	</property>
+</bean>
+
+<bean name="multiTestController" class="com.test3.MultiTestController">
+	<property name="methodNameResolver" ref="propsResolver"></property>
+</bean>
+
+<bean name="memController" class="com.test2.MemController">
+	<property name="pages">
+		<list>
+			<value>test2/mem1</value>
+			<value>test2/mem2</value>
+			<value>test2/mem3</value>
+		</list>	
+	</property>
+</bean>
+
+<bean name="authenticator-ref" class="com.test1.LoginAuthenticatorImpl" />
+<bean name="loginController" class="com.test1.LoginController">
+	<property name="authenticator" ref="authenticator-ref" />
+	<property name="commandClass" value="com.test1.LoginCommand" />
+	<property name="commandName" value="loginCommand" />
+	<property name="formView" value="test1/login" />
+</bean>
+
+
+<!-- listController는 메소드이기 때문에 객체를 생성해주어야한다. -->
+<bean name="listFormController" class="com.test.ListFormController" />
+<bean name="listController" class="com.test.ListController" />
 </beans>
